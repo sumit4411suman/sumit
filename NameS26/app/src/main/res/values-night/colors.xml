@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#FF000000</color>
+    <color name="card">#FF17191E</color>
+    <color name="card_stroke">#1AFFFFFF</color>
+    <color name="text_primary">#FFF2F3F7</color>
+    <color name="text_secondary">#FFA2A8B5</color>
+    <color name="accent">#FF5B8CFF</color>
+    <color name="accent_pressed">#FF4A76DB</color>
+    <color name="on_accent">#FF0B1020</color>
+    <color name="btn_secondary">#FF262A33</color>
+    <color name="btn_secondary_pressed">#FF333845</color>
+    <color name="danger">#FFFF6B6B</color>
+    <color name="danger_soft">#FF3A1C1C</color>
+    <color name="ok">#FF4CD98A</color>
+    <color name="ok_soft">#FF15301F</color>
+    <color name="warn">#FFFFB84D</color>
+    <color name="warn_soft">#FF3A2A10</color>
+    <color name="info">#FF7FA6FF</color>
+    <color name="info_soft">#FF17223D</color>
+    <color name="neutral_soft">#FF262A33</color>
+    <color name="log_bg">#FF0E1015</color>
+    <color name="log_text">#FFC9D1E0</color>
+    <color name="divider">#1AFFFFFF</color>
+</resources>

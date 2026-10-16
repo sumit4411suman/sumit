@@ -1,0 +1,6 @@
+id=names26_product_name
+name=NameS26 Product Name (Galaxy S26)
+version=1.0.0
+versionCode=100
+author=NameS26
+description=Systemless override of SEC_FLOATING_FEATURE_SETTINGS_CONFIG_BRAND_NAME (Galaxy S25 -> Galaxy S26) for SM-S931B. Model number, IMEI, serial, bootloader and firmware are untouched. Remove the module to roll back.

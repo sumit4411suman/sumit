@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NameS26</string>
+    <string name="app_subtitle">Product name changer for Galaxy S25 (SM-S931B)</string>
+
+    <string name="target_product_name" translatable="false">Galaxy S26</string>
+    <string name="expected_product_name" translatable="false">Galaxy S25</string>
+
+    <string name="status_idle">Not checked yet</string>
+    <string name="status_checking">Reading device properties…</string>
+
+    <string name="card_device">Device</string>
+    <string name="card_source">Product name source</string>
+    <string name="card_compat">Compatibility &amp; permissions</string>
+    <string name="card_actions">Actions</string>
+    <string name="card_module">Module status</string>
+    <string name="card_log">Diagnostic log</string>
+
+    <string name="btn_refresh">Refresh diagnostics</string>
+    <string name="btn_change">Change Product Name to Galaxy S26</string>
+    <string name="btn_verify">Verify result</string>
+    <string name="btn_reboot">Reboot now</string>
+    <string name="btn_rollback">Roll back (remove module)</string>
+    <string name="btn_export_zip">Export Magisk module ZIP</string>
+    <string name="btn_export_log">Export diagnostic log</string>
+    <string name="btn_open_about">Open Settings › About phone</string>
+    <string name="btn_root_check">Check root &amp; Magisk</string>
+
+    <string name="dlg_change_title">Change Product Name to Galaxy S26?</string>
+    <string name="dlg_change_body">NameS26 will:\n\n• Ask your root manager (Magisk) for root access.\n• Re-run the compatibility checks with root.\n• Install the bundled, reversible Magisk module names26_product_name.\n\nThe module replaces only the value of SEC_FLOATING_FEATURE_SETTINGS_CONFIG_BRAND_NAME in a systemless copy of floating_feature.xml. It does not touch the model number, IMEI, serial number, bootloader or firmware, and it does not write to the system partition.\n\nNothing changes until you reboot. The app will not report success until the new value is verified after the reboot.</string>
+    <string name="dlg_reboot_title">Reboot now?</string>
+    <string name="dlg_reboot_body">The phone will restart normally. Save your work first. After the restart open NameS26 again and press “Verify result”.</string>
+    <string name="dlg_rollback_title">Remove the NameS26 module?</string>
+    <string name="dlg_rollback_body">The module will be marked for removal and the original floating_feature.xml is used again after the next reboot. Nothing else is changed.</string>
+    <string name="dlg_ok">Continue</string>
+    <string name="dlg_cancel">Cancel</string>
+
+    <string name="label_manufacturer">Manufacturer</string>
+    <string name="label_brand">Brand</string>
+    <string name="label_model">Model number (ro.product.model)</string>
+    <string name="label_device">Device codename (ro.product.device)</string>
+    <string name="label_product">ro.product.name</string>
+    <string name="label_android">Android version</string>
+    <string name="label_oneui">One UI version</string>
+    <string name="label_build">Build number</string>
+    <string name="label_fingerprint">Build fingerprint</string>
+    <string name="label_patch">Security patch</string>
+    <string name="label_baseband">Baseband</string>
+    <string name="label_device_name">Device name (Settings.Global)</string>
+    <string name="label_bootcount">Boot count</string>
+
+    <string name="not_available">unavailable</string>
+</resources>
