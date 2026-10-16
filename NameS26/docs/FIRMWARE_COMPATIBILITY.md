@@ -86,6 +86,38 @@ Known risks and unknowns:
    until they refresh; the About phone screen reads the value live.
 4. Samsung Settings also shows the model **number** `SM-S931B/DS`, which stays exactly as it is.
 
+## Root availability on this firmware (the blocker)
+
+On 2026-10-16 the app was run on the target phone (screenshots supplied by the user):
+
+* `SemFloatingFeature.getString(SEC_FLOATING_FEATURE_SETTINGS_CONFIG_BRAND_NAME)` = **`Galaxy S25`**
+* `/system/etc/floating_feature.xml` contains the key with `Galaxy S25`; `/vendor/etc/floating_feature.xml` and
+  `/system/vendor/etc/floating_feature.xml` exist but do not contain the key; `ro.product.name` = `pa1qxins`.
+  → The mapping in this report is **confirmed on One UI 9**.
+* Pressing *Change Product Name to Galaxy S26* was blocked: `su binary not available (IOException: Cannot run
+  program "su": error=2)`. → **The phone is not rooted.**
+
+Consequences:
+
+1. `/system/etc/floating_feature.xml` is on the read-only, dm-verity protected system partition. Without root
+   there is no supported or unsupported way for an app, ADB, Shizuku or a Knox policy to change that value. The
+   requirement cannot be met on the phone in its current state, and NameS26 correctly refuses instead of
+   claiming success.
+2. Installing Magisk the normal way needs an unlocked bootloader. Multiple reports from July 2025 found that
+   One UI 8 removed the *OEM unlocking* option on Galaxy devices worldwide, including the S25 series, and that
+   the unlock code itself appears to have been stripped from the bootloader
+   ([9to5Google](https://9to5google.com/2025/07/26/samsung-galaxy-one-ui-8-bootloader-unlock/),
+   [SamMobile](https://www.sammobile.com/news/say-goodbye-to-your-custom-roms-as-one-ui-8-kills-bootloader-unlock/),
+   [GSMArena](https://www.gsmarena.com/samsung_restricts_bootloader_unlocking_on_one_ui_8_devices-news-68788.php)).
+   On One UI 9 firmware this is expected to still apply. Check Settings › Developer options for *OEM unlocking*;
+   if it is absent, Magisk cannot be installed and the product name cannot be changed on this firmware.
+3. Even where unlocking is possible, it permanently trips the Knox warranty bit (0x1), disables Samsung
+   Wallet/Pay, Secure Folder, Samsung Health secure features and Knox-dependent apps, and wipes the phone.
+   NameS26 does not and will not perform this; it is a decision only the owner can take, with that cost in mind.
+4. Third-party sites describe a temporary, exploit-based "root on locked bootloader" method for One UI 9. It is
+   not a Magisk installation: it does not survive a reboot and provides no module mounting, so the NameS26 module
+   cannot work with it. It was not evaluated or used for this project.
+
 ## Compatibility checks performed automatically
 
 In the app (before root): manufacturer is Samsung, model is SM-S931x, Android ≥ 10, `floating_feature.xml`

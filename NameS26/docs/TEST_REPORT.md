@@ -1,4 +1,4 @@
-# Test report — NameS26 1.0.0 (build 100)
+# Test report — NameS26 1.0.1 (build 101)
 
 Date: 2026-10-16. Build environment: Linux x86_64 container, OpenJDK 21, Kotlin 2.2.0, Debian aapt2 2.19 /
 apksigner 0.9 / dx 1.16, android.jar API 35 (compile) and API 34 (resource link), busybox ash and shellcheck for
@@ -16,9 +16,11 @@ the module scripts.
 | Installer simulation with stubbed Magisk functions (success, 3 refusals, upgrade) | **Pass** |
 | Boot guard simulation (same fingerprint → mount; changed fingerprint → skip + disable) | **Pass** |
 | Gradle / Android Gradle Plugin build | **Not run** (no route to Google Maven in the build environment) |
-| **On-device result on SM-S931B/DS, S931BXXUCDZIF** | **Not verified** — no device was attached to the build environment |
+| On-device run of the app on SM-S931B, One UI 9 (user screenshots, 2026-10-16) | **Pass** — app runs, mapping confirmed (`Galaxy S25` from framework and `/system/etc/floating_feature.xml`), change correctly **blocked: phone not rooted** |
+| **Product name changed to Galaxy S26 in Settings** | **Not achieved** — the phone has no root (no `su`), so the module could not be installed; see section 5 |
 
-**Therefore this report does not claim that Settings › About phone shows "Galaxy S26" on your phone.** The
+**Therefore this report does not claim that Settings › About phone shows "Galaxy S26" on your phone; as of the
+on-device run it still shows "Galaxy S25".** The
 acceptance criteria in the task can only be confirmed on the device; the app is built to perform that
 confirmation itself and to refuse to report success otherwise (see *On-device verification* below).
 
@@ -29,7 +31,7 @@ confirmation itself and to refuse to report success otherwise (see *On-device ve
 Output:
 
 ```
-7883a5b129f0fef0e1c925c2948366e7c3c4751f6703224115ee6c370f556b69  NameS26.apk        (833 KB)
+696ea2fa1dff9984bf759e97d5beca83e1ada14459f6e1db42ac993b47f9c712  NameS26.apk
 117fc1f4a33b33c97d8aedaa0e1b734c378c54a5754af2b23fcb4b7ec7cb19e6  NameS26-magisk-module.zip
 ```
 `apksigner verify --verbose`: *Verifies*, v3 scheme used for minSdk 29 (v1/v2 signatures are present as well).
@@ -86,3 +88,29 @@ and deletes the module's `system/` overlay directory.
 If step 2 yields *Module active but product name still "Galaxy S25"*, One UI 9 reads the name from a source
 other than the floating-feature key on this firmware. Export the diagnostic log (it contains the key values from
 every scanned path and the module boot log) and roll back; the module leaves nothing behind.
+
+### 5. On-device run (user-supplied screenshots, 2026-10-16, NameS26 1.0.0)
+
+Screen 1 (launch, no root requested): status *Not applied — product name is "Galaxy S25"*, model number
+unchanged `SM-S931B`. Product name source card:
+
+| Source | Value |
+|---|---|
+| Framework `SemFloatingFeature.getString(SEC_FLOATING_FEATURE_SETTINGS_CONFIG_BRAND_NAME)` | `Galaxy S25` |
+| `/system/etc/floating_feature.xml` | `Galaxy S25` (present, key found) |
+| `/vendor/etc/floating_feature.xml` | present, key not found |
+| `/system/vendor/etc/floating_feature.xml` | present, key not found |
+| `ro.product.name` | `pa1qxins` |
+
+This confirms on One UI 9 / Android 17 that the displayed name is the floating-feature value in
+`/system/etc/floating_feature.xml` and that the vendor copy does not carry it (the module would patch only the
+system copy, as designed).
+
+Screen 2 (after pressing *Change Product Name to Galaxy S26*): *Blocked — compatibility check failed. Root access:
+Not granted: su binary not available (IOException: Cannot run program "su": error=2, No such file or directory).*
+Nothing was installed or changed.
+
+Result: the acceptance criteria are **not met** because the device is not rooted, and the app reported that
+accurately instead of claiming success. Version 1.0.1 shows this as a FAIL check on the first screen, before
+any button press. Whether root is obtainable at all on this firmware is discussed in
+`docs/FIRMWARE_COMPATIBILITY.md` (One UI 8+ removed bootloader unlocking).

@@ -10,6 +10,14 @@ number or bootloader. It consists of:
 * a separate, reversible **Magisk module** (`magisk-module/`, bundled inside the APK and also shipped as a ZIP)
   that overlays one value in `floating_feature.xml` systemlessly.
 
+> **Status after the first on-device run (2026-10-16).** NameS26 1.0.0 was run on the user's SM-S931B with
+> One UI 9 / Android 17. It confirmed that Samsung Settings reads the name from
+> `SEC_FLOATING_FEATURE_SETTINGS_CONFIG_BRAND_NAME` (`Galaxy S25`, framework and `/system/etc/floating_feature.xml`;
+> `ro.product.name` is `pa1qxins`). The change was then **blocked by the app because the phone is not rooted**
+> (no `su` binary). The target field cannot be changed on an unrooted phone, and Samsung removed bootloader
+> unlocking from One UI 8 onwards, so Magisk may not be installable on this firmware at all.
+> See `docs/TEST_REPORT.md` and `docs/FIRMWARE_COMPATIBILITY.md` for the details.
+
 > **Read first.** The change needs a phone that is *already* rooted with Magisk 24+. NameS26 never roots,
 > unlocks, flashes or wipes anything. The app reports success only after the new value has been verified on the
 > device; see `docs/TEST_REPORT.md` for what was and was not verified during development.
@@ -28,7 +36,7 @@ number or bootloader. It consists of:
 | 8 | SHA-256 checksums | `dist/SHA256SUMS.txt` (also below) |
 
 ```
-7883a5b129f0fef0e1c925c2948366e7c3c4751f6703224115ee6c370f556b69  NameS26.apk
+696ea2fa1dff9984bf759e97d5beca83e1ada14459f6e1db42ac993b47f9c712  NameS26.apk
 117fc1f4a33b33c97d8aedaa0e1b734c378c54a5754af2b23fcb4b7ec7cb19e6  NameS26-magisk-module.zip
 ```
 

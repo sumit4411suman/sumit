@@ -21,8 +21,8 @@ DX="${DX:-/usr/lib/android-sdk/build-tools/debian/dx}"
 D8_JAR="${D8_JAR:-}"
 MIN_SDK=29
 TARGET_SDK=35
-VERSION_CODE=100
-VERSION_NAME=1.0.0
+VERSION_CODE=101
+VERSION_NAME=1.0.1
 PKG=com.names26.productchanger
 
 rm -rf "$BUILD"; mkdir -p "$BUILD"/{res,gen,classes,assets,apk} "$DIST"

@@ -26,6 +26,11 @@ object Compatibility {
     const val MODEL_PREFIX = "SM-S931"
     const val MIN_MAGISK_CODE = 24000
 
+    /** True if a su binary exists in one of the usual locations (no prompt, no execution). */
+    fun suBinaryPresent(): Boolean =
+        listOf("/debug_ramdisk/su", "/sbin/su", "/system/bin/su", "/system/xbin/su", "/product/bin/su", "/vendor/bin/su", "/data/adb/ksu/bin/su")
+            .any { java.io.File(it).exists() }
+
     /** Requests root (shows the root manager prompt) and identifies the root manager. */
     fun checkRoot(): RootStatus {
         val r = Shell.su(
@@ -99,6 +104,14 @@ object Compatibility {
         else Check("Property mapping", CheckStatus.INFO, "ro.product.name = '${info.productName}' (build codename, not displayed). Settings reads ${FloatingFeature.KEY}. Nothing else is touched.")
 
         checks += when {
+            root == null && info.suOnPath.isBlank() && !suBinaryPresent() -> Check(
+                "Root access",
+                CheckStatus.FAIL,
+                "No su binary on this phone: it is not rooted. floating_feature.xml lives on the read-only, verity-protected " +
+                    "system partition and can only be replaced systemlessly by a Magisk module, so the product name cannot be " +
+                    "changed on the phone as it is. NameS26 will not root or unlock anything. Note: Samsung removed the OEM " +
+                    "bootloader-unlock option in One UI 8 and later, so Magisk may not be installable on this firmware at all."
+            )
             root == null -> Check("Root access", CheckStatus.WARN, "Not requested yet. Root is only requested when you press the change button or “Check root & Magisk”.")
             root.granted -> Check("Root access", CheckStatus.PASS, "Granted (${root.uid.ifBlank { "uid=0" }}).")
             else -> Check("Root access", CheckStatus.FAIL, "Not granted: ${root.detail}. The module cannot be installed without a root manager that grants su to NameS26.")
