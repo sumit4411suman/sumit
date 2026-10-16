@@ -36,7 +36,7 @@ number or bootloader. It consists of:
 | 8 | SHA-256 checksums | `dist/SHA256SUMS.txt` (also below) |
 
 ```
-696ea2fa1dff9984bf759e97d5beca83e1ada14459f6e1db42ac993b47f9c712  NameS26.apk
+7997c9f170fcd6bbf66a91a525345d9314ea59aaa84dd2d7249a7f4e01cc122a  NameS26.apk
 117fc1f4a33b33c97d8aedaa0e1b734c378c54a5754af2b23fcb4b7ec7cb19e6  NameS26-magisk-module.zip
 ```
 
@@ -50,36 +50,32 @@ in a `system.prop`; that part was replaced. Details and evidence: `docs/FIRMWARE
 
 NameS26 shows both values on its main screen so you can confirm this on your own phone before installing anything.
 
-## Installation
+## Installation (one APK, five steps)
 
-Prerequisites: Galaxy S25 SM-S931B/DS, Magisk 24.0 or newer installed and working, USB debugging optional but
-recommended for recovery (`docs/ROLLBACK_RECOVERY.md`). Make a backup of your data as you would before any
-root modification.
+Prerequisites: Galaxy S25 SM-S931B/DS, Magisk 24.0 or newer already installed and working. NameS26 does not root,
+unlock or flash anything; on an unrooted phone step 2 fails and nothing can be changed. Back up your data as you
+would before any root modification.
 
-1. Copy `dist/NameS26.apk` to the phone and install it (allow "install unknown apps" for your file manager).
-   Optional: verify the checksum first, e.g. `sha256sum NameS26.apk` on a PC or `adb shell sha256sum`.
-2. Open **NameS26**. The first screen shows, without root:
-   * *Product name source*: the framework value (`SemFloatingFeature`) and the file value of the key, plus
-     `ro.product.name` for comparison. On stock firmware both read `Galaxy S25`.
-   * *Device*: manufacturer, model number, codename, Android/One UI version, build number, fingerprint,
-     security patch, baseband, device name, boot count.
-   * *Compatibility & permissions*: the pre-flight checks. Every FAIL blocks the change button.
-3. Press **Check root & Magisk** (optional). Magisk asks whether NameS26 may use root; the app then also reads
-   the module state. Root is never requested silently at launch.
-4. Press **Change Product Name to Galaxy S26** and read the confirmation. The app requests root, re-runs the
-   checks, stages the bundled module ZIP and runs `magisk --install-module`. The installer output is logged.
-   If any check fails, nothing is installed and the reason is shown.
-5. The status turns to **"Module installed — reboot required"**. This is *not* success. Press **Reboot now**
-   (or reboot manually).
-6. After the reboot open NameS26 and press **Verify result**. The app reads the live framework value and the
-   file again and only then reports **"Verified: product name is now Galaxy S26"**, together with the unchanged
-   model number. Press **Open Settings › About phone** to see the field.
-   Any other outcome (*Not applied*, *Module active but product name still "Galaxy S25"*, *Could not verify*) is
-   reported as such with the reason; use **Export diagnostic log** to collect `Download/NameS26/names26-diagnostics.txt`.
+1. Install `dist/NameS26.apk` (allow "install unknown apps" for your file manager; optional: compare the SHA-256
+   with `dist/SHA256SUMS.txt`). The module ZIP is inside the APK; nothing else has to be downloaded or selected.
+2. Open **NameS26** and press the buttons in order:
+   1. **Check compatibility** — reads the device properties and the product-name source without root. Every FAIL
+      blocks the change button.
+   2. **Request root access** — Magisk shows its prompt; allow NameS26. The app then also reads the module state.
+   3. **Change Product Name to Galaxy S26** — confirmation dialog, then the bundled module is installed with
+      Magisk's own installer (`magisk --install-module`). If root works but the Magisk command line is not
+      reachable, NameS26 saves the ZIP to `Download/NameS26/` and opens the Magisk app for you: Modules › Install
+      from storage › pick the ZIP. Either way the installer prints the compatibility checks and refuses
+      incompatible devices.
+   4. **Reboot now** — the change is not active before the reboot and the app says so.
+   5. **Verify result** — the app re-reads the Samsung framework value (`SemFloatingFeature`) and the file. Only
+      `Galaxy S26` from the framework with the model number unchanged is reported as **Verified**. It then asks
+      you to look at Settings › About phone and records your answer; a "No" turns the status into a mismatch.
+3. **Roll back** at any time: marks the module for removal; after the reboot the stock file is used again and the
+   product name returns to `Galaxy S25`. Press *Verify result* after that reboot to confirm.
 
-Alternative without the app installer: press **Export Magisk module ZIP** (saved to `Download/NameS26/`) or copy
-`dist/NameS26-magisk-module.zip`, then install it from Magisk › Modules › *Install from storage* and reboot.
-The installer prints the same checks and refuses incompatible devices.
+The **More** card has *Open Settings › About phone*, *Open Magisk app*, *Export Magisk module ZIP* and
+*Export diagnostic log* (`Download/NameS26/names26-diagnostics.txt`).
 
 ### Rollback
 NameS26 › **Roll back (remove module)** › reboot, or remove the module in the Magisk app. Full list including

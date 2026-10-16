@@ -117,6 +117,9 @@ object Compatibility {
             else -> Check("Root access", CheckStatus.FAIL, "Not granted: ${root.detail}. The module cannot be installed without a root manager that grants su to NameS26.")
         }
 
+        checks += if (info.magiskAppPackage != null) Check("Magisk app", CheckStatus.PASS, "Installed (${info.magiskAppPackage}). It can install the module if the command-line installer is unavailable.")
+        else Check("Magisk app", CheckStatus.WARN, "Not found (or installed under a hidden package name). Module installation needs Magisk.")
+
         if (root != null && root.granted) {
             checks += when {
                 root.isMagisk && root.managerVersionCode >= MIN_MAGISK_CODE -> Check("Magisk", CheckStatus.PASS, root.detail)

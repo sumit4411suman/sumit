@@ -1,2 +1,2 @@
-696ea2fa1dff9984bf759e97d5beca83e1ada14459f6e1db42ac993b47f9c712  NameS26.apk
+7997c9f170fcd6bbf66a91a525345d9314ea59aaa84dd2d7249a7f4e01cc122a  NameS26.apk
 117fc1f4a33b33c97d8aedaa0e1b734c378c54a5754af2b23fcb4b7ec7cb19e6  NameS26-magisk-module.zip
