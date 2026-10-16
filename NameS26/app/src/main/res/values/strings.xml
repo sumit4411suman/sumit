@@ -16,15 +16,30 @@
     <string name="card_module">Module status</string>
     <string name="card_log">Diagnostic log</string>
 
-    <string name="btn_refresh">Refresh diagnostics</string>
-    <string name="btn_change">Change Product Name to Galaxy S26</string>
-    <string name="btn_verify">Verify result</string>
-    <string name="btn_reboot">Reboot now</string>
-    <string name="btn_rollback">Roll back (remove module)</string>
+    <string name="btn_refresh">1 · Check compatibility</string>
+    <string name="btn_change">3 · Change Product Name to Galaxy S26</string>
+    <string name="btn_verify">5 · Verify result</string>
+    <string name="btn_reboot">4 · Reboot now</string>
+    <string name="btn_rollback">Roll back (remove module, restore Galaxy S25)</string>
     <string name="btn_export_zip">Export Magisk module ZIP</string>
     <string name="btn_export_log">Export diagnostic log</string>
     <string name="btn_open_about">Open Settings › About phone</string>
-    <string name="btn_root_check">Check root &amp; Magisk</string>
+    <string name="btn_root_check">2 · Request root access</string>
+    <string name="btn_open_magisk">Open Magisk app</string>
+    <string name="card_more">More</string>
+    <string name="steps_hint">Do the steps in order. Nothing is changed before step 3, nothing is active before step 4, and only step 5 can report success.</string>
+
+    <string name="dlg_magisk_app_title">Install the module from the Magisk app</string>
+    <string name="dlg_magisk_app_body">Root is granted, but the Magisk command-line installer could not be reached from this app. The module ZIP has been saved to
+
+Download/NameS26/NameS26-magisk-module.zip
+
+In the Magisk app: Modules › Install from storage › pick that file › confirm. The installer prints the same compatibility checks. Then reboot and press “Verify result” in NameS26.</string>
+    <string name="dlg_visual_title">Confirm in Settings</string>
+    <string name="dlg_visual_body">The framework now reports Galaxy S26. Open Settings › About phone and check the product name shown there. Does it read “Galaxy S26” with model number SM-S931B/DS unchanged?</string>
+    <string name="dlg_visual_yes">Yes, it shows Galaxy S26</string>
+    <string name="dlg_visual_no">No, something else</string>
+    <string name="dlg_visual_later">Check later</string>
 
     <string name="dlg_change_title">Change Product Name to Galaxy S26?</string>
     <string name="dlg_change_body">NameS26 will:\n\n• Ask your root manager (Magisk) for root access.\n• Re-run the compatibility checks with root.\n• Install the bundled, reversible Magisk module names26_product_name.\n\nThe module replaces only the value of SEC_FLOATING_FEATURE_SETTINGS_CONFIG_BRAND_NAME in a systemless copy of floating_feature.xml. It does not touch the model number, IMEI, serial number, bootloader or firmware, and it does not write to the system partition.\n\nNothing changes until you reboot. The app will not report success until the new value is verified after the reboot.</string>

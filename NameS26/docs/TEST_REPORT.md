@@ -1,4 +1,4 @@
-# Test report — NameS26 1.0.1 (build 101)
+# Test report — NameS26 1.1.0 (build 110)
 
 Date: 2026-10-16. Build environment: Linux x86_64 container, OpenJDK 21, Kotlin 2.2.0, Debian aapt2 2.19 /
 apksigner 0.9 / dx 1.16, android.jar API 35 (compile) and API 34 (resource link), busybox ash and shellcheck for
@@ -31,7 +31,7 @@ confirmation itself and to refuse to report success otherwise (see *On-device ve
 Output:
 
 ```
-696ea2fa1dff9984bf759e97d5beca83e1ada14459f6e1db42ac993b47f9c712  NameS26.apk
+7997c9f170fcd6bbf66a91a525345d9314ea59aaa84dd2d7249a7f4e01cc122a  NameS26.apk
 117fc1f4a33b33c97d8aedaa0e1b734c378c54a5754af2b23fcb4b7ec7cb19e6  NameS26-magisk-module.zip
 ```
 `apksigner verify --verbose`: *Verifies*, v3 scheme used for minSdk 29 (v1/v2 signatures are present as well).
@@ -114,3 +114,16 @@ Result: the acceptance criteria are **not met** because the device is not rooted
 accurately instead of claiming success. Version 1.0.1 shows this as a FAIL check on the first screen, before
 any button press. Whether root is obtainable at all on this firmware is discussed in
 `docs/FIRMWARE_COMPATIBILITY.md` (One UI 8+ removed bootloader unlocking).
+
+### 6. Version 1.1.0 (build 110) — one-APK flow
+
+Changes: five ordered buttons (Check compatibility, Request root access, Change Product Name, Reboot, Verify
+result) plus Roll back; Magisk-app detection (`com.topjohnwu.magisk`, declared in `<queries>`); fallback that saves
+the bundled ZIP to Downloads and opens the Magisk app when root is granted but the `magisk` CLI is not reachable
+(installer exit code 90); a recorded visual confirmation of Settings › About phone after a framework-verified
+result ("No" downgrades the status to a mismatch); rollback text states that `Galaxy S25` is restored.
+
+Verification in the build environment: Kotlin compiles, APK builds and signs, manifest still declares **no
+permissions**, bundled `assets/names26_module.zip` unchanged (same SHA-256 as 1.0.x). Not run on a rooted device:
+the fallback path and the post-reboot verification remain to be exercised on the target phone, which at the last
+run had no root.

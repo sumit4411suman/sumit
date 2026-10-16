@@ -25,7 +25,8 @@ data class DeviceInfo(
     val systemModel: String,
     val deviceNameSetting: String,
     val bootCount: Int,
-    val suOnPath: String
+    val suOnPath: String,
+    val magiskAppPackage: String?
 ) {
     val oneUiVersion: String get() = DeviceInfoCollector.formatOneUi(oneUiVersionRaw)
     val isSamsung: Boolean get() = manufacturer.equals("samsung", ignoreCase = true)
@@ -73,7 +74,8 @@ object DeviceInfoCollector {
             systemModel = SystemProps.get("ro.product.system.model"),
             deviceNameSetting = deviceName,
             bootCount = bootCount,
-            suOnPath = Shell.sh("command -v su 2>/dev/null", 5_000).stdout.trim()
+            suOnPath = Shell.sh("command -v su 2>/dev/null", 5_000).stdout.trim(),
+            magiskAppPackage = ModuleManager.magiskAppPackage(context)
         )
         AppLog.i(
             "device",

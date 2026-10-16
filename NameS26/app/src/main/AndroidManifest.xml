@@ -4,6 +4,11 @@
     <!-- No permissions are requested. Privileged work is done only through an explicit root (su) grant
          that the user approves in their root manager, and only when they press the change button. -->
 
+    <!-- Needed on Android 11+ to detect and launch the Magisk app (fallback installer). -->
+    <queries>
+        <package android:name="com.topjohnwu.magisk" />
+    </queries>
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"

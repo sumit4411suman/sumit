@@ -1,6 +1,7 @@
 package com.names26.productchanger
 
 import android.content.Context
+import android.content.Intent
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
@@ -29,6 +30,19 @@ object ModuleManager {
     const val EXPORT_NAME = "NameS26-magisk-module.zip"
     const val MODULE_DIR = "/data/adb/modules/$MODULE_ID"
     const val UPDATE_DIR = "/data/adb/modules_update/$MODULE_ID"
+
+    /** Exit code of [install] when root works but no magisk binary is reachable from the su shell. */
+    const val EXIT_NO_MAGISK_CLI = 90
+
+    private val MAGISK_APP_PACKAGES = listOf("com.topjohnwu.magisk")
+
+    /** Package name of an installed Magisk app, or null. A repackaged (hidden) Magisk app cannot be detected. */
+    fun magiskAppPackage(context: Context): String? =
+        MAGISK_APP_PACKAGES.firstOrNull { context.packageManager.getLaunchIntentForPackage(it) != null }
+
+    fun magiskAppLaunchIntent(context: Context): Intent? =
+        magiskAppPackage(context)?.let { context.packageManager.getLaunchIntentForPackage(it) }
+            ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
     /** Copies the bundled module ZIP into private storage so root can install it; returns the file. */
     fun stageZip(context: Context): File {
@@ -104,7 +118,7 @@ object ModuleManager {
             """
             M="${'$'}(command -v magisk 2>/dev/null)"
             [ -z "${'$'}M" ] && for c in /debug_ramdisk/magisk /sbin/magisk /data/adb/magisk/magisk; do [ -x "${'$'}c" ] && M="${'$'}c" && break; done
-            [ -z "${'$'}M" ] && { echo "magisk binary not found"; exit 90; }
+            [ -z "${'$'}M" ] && { echo "magisk binary not found"; exit $EXIT_NO_MAGISK_CLI; }
             [ -r "$path" ] || { echo "zip not readable by root: $path"; exit 91; }
             "${'$'}M" --install-module "$path"
             """.trimIndent(),

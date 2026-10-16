@@ -50,6 +50,7 @@ class MainActivity : Activity() {
     private lateinit var btnExportZip: Button
     private lateinit var btnExportLog: Button
     private lateinit var btnOpenAbout: Button
+    private lateinit var btnOpenMagisk: Button
 
     private val logListener: () -> Unit = { renderLog() }
 
@@ -88,6 +89,7 @@ class MainActivity : Activity() {
         btnExportZip = findViewById(R.id.btn_export_zip)
         btnExportLog = findViewById(R.id.btn_export_log)
         btnOpenAbout = findViewById(R.id.btn_open_about)
+        btnOpenMagisk = findViewById(R.id.btn_open_magisk)
 
         btnRefresh.setOnClickListener { refresh(withRoot = root?.granted == true) }
         btnRootCheck.setOnClickListener { refresh(withRoot = true) }
@@ -98,6 +100,7 @@ class MainActivity : Activity() {
         btnExportZip.setOnClickListener { exportZip() }
         btnExportLog.setOnClickListener { exportLog() }
         btnOpenAbout.setOnClickListener { openAboutPhone() }
+        btnOpenMagisk.setOnClickListener { openMagiskApp() }
     }
 
     // ---------------------------------------------------------------- data collection
@@ -124,6 +127,7 @@ class MainActivity : Activity() {
                     info = i; snapshot = s; root = r; module = m; lastVerify = v
                     render()
                     setBusy(false)
+                    if (v.outcome == Outcome.VERIFIED && visualConfirmation(i) == null) askVisualConfirmation(i)
                 }
             } catch (t: Throwable) {
                 AppLog.e("refresh", "unexpected failure", t)
@@ -192,6 +196,23 @@ class MainActivity : Activity() {
                 val output = (result.stdout + "\n" + result.stderr).trim()
                 AppLog.i("change", "installer output:\n$output")
                 val installerSaysDone = output.contains("NameS26: install complete") || output.contains("Installation finished")
+                if (result.exitCode == ModuleManager.EXIT_NO_MAGISK_CLI) {
+                    // Root works but `magisk` is not reachable from this su shell: hand the ZIP to the Magisk app.
+                    val shown = Exports.saveToDownloads(this, zip, ModuleManager.EXPORT_NAME, "application/zip")
+                    AppLog.w("change", "magisk CLI unreachable; exported ZIP to ${shown ?: "(export failed)"} for the Magisk app")
+                    main.post {
+                        showStatus(
+                            Outcome.UNVERIFIED,
+                            "Install the module from the Magisk app",
+                            "Root is granted but the Magisk command-line installer is not reachable. The module ZIP is at " +
+                                "${shown ?: "(export failed, use “Export Magisk module ZIP”)"}. Magisk › Modules › Install from storage › " +
+                                "select it › reboot › press “Verify result” here."
+                        )
+                        setBusy(false)
+                        showMagiskAppDialog()
+                    }
+                    return@execute
+                }
                 if (!result.ok || !installerSaysDone) {
                     main.post {
                         showStatus(
@@ -275,7 +296,8 @@ class MainActivity : Activity() {
                         Outcome.PENDING_REBOOT,
                         "Rollback scheduled — reboot required",
                         res.stdout.trim().ifBlank { "Module marked for removal." } +
-                            "\nAfter the reboot the original floating_feature.xml is used again."
+                            "\nAfter the reboot the stock floating_feature.xml is used again and the product name returns to " +
+                            "${Compatibility.EXPECTED_CURRENT_VALUE}. Press “Verify result” after the reboot to confirm."
                     )
                     setBusy(false)
                 }
@@ -325,6 +347,52 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun openMagiskApp() {
+        val intent = ModuleManager.magiskAppLaunchIntent(this)
+        if (intent == null) {
+            toast("Magisk app not found. If it is installed under a hidden name, open it from the launcher.")
+            return
+        }
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            toast("Could not open the Magisk app: ${e.message}")
+        }
+    }
+
+    private fun showMagiskAppDialog() {
+        val b = AlertDialog.Builder(this)
+            .setTitle(R.string.dlg_magisk_app_title)
+            .setMessage(R.string.dlg_magisk_app_body)
+            .setNegativeButton(R.string.dlg_cancel, null)
+        if (ModuleManager.magiskAppLaunchIntent(this) != null) {
+            b.setPositiveButton(R.string.btn_open_magisk) { _, _ -> openMagiskApp() }
+        }
+        b.show()
+    }
+
+    /** "yes" / "no" recorded by the user for the current firmware, or null if not asked/answered yet. */
+    private fun visualConfirmation(i: DeviceInfo): String? {
+        if (prefs.getString("visualFingerprint", "") != i.fingerprint) return null
+        return prefs.getString("visualConfirm", null)
+    }
+
+    private fun askVisualConfirmation(i: DeviceInfo) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.dlg_visual_title)
+            .setMessage(R.string.dlg_visual_body)
+            .setPositiveButton(R.string.dlg_visual_yes) { _, _ -> recordVisual(i, "yes") }
+            .setNegativeButton(R.string.dlg_visual_no) { _, _ -> recordVisual(i, "no") }
+            .setNeutralButton(R.string.dlg_visual_later) { _, _ -> openAboutPhone() }
+            .show()
+    }
+
+    private fun recordVisual(i: DeviceInfo, answer: String) {
+        prefs.edit().putString("visualConfirm", answer).putString("visualFingerprint", i.fingerprint).apply()
+        AppLog.i("verify", "user visual confirmation in Settings › About phone: $answer")
+        render()
+    }
+
     // ---------------------------------------------------------------- install record (SharedPreferences)
 
     private fun installRecord(): InstallRecord? {
@@ -339,7 +407,7 @@ class MainActivity : Activity() {
     }
 
     private fun clearInstallRecord() {
-        prefs.edit().clear().apply()
+        prefs.edit().clear().apply()   // also clears the visual confirmation
     }
 
     // ---------------------------------------------------------------- rendering
@@ -347,7 +415,14 @@ class MainActivity : Activity() {
     private fun render() {
         val i = info
         val s = snapshot
-        lastVerify?.let { showStatus(it.outcome, it.title, it.detail) }
+        lastVerify?.let { v ->
+            val visual = if (i != null && v.outcome == Outcome.VERIFIED) visualConfirmation(i) else null
+            when (visual) {
+                "yes" -> showStatus(Outcome.VERIFIED, v.title + " — confirmed in Settings", v.detail + " You confirmed the About phone screen shows Galaxy S26.")
+                "no" -> showStatus(Outcome.MISMATCH, "Framework reports Galaxy S26, but Settings shows something else", v.detail + " You reported that About phone does not show Galaxy S26; export the diagnostic log and roll back if needed.")
+                else -> showStatus(v.outcome, v.title, v.detail)
+            }
+        }
         renderSource(s, i)
         renderDevice(i)
         renderCompat(i, s)
@@ -453,6 +528,7 @@ class MainActivity : Activity() {
         btnRootCheck.isEnabled = !busy
         btnExportZip.isEnabled = !busy
         btnExportLog.isEnabled = !busy
+        btnOpenMagisk.isEnabled = !busy
     }
 
     private fun setBusy(value: Boolean) {
