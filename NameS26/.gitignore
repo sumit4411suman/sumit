@@ -1,0 +1,16 @@
+# Gradle / Android Studio
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+# Standalone toolchain build outputs (tools/build-apk.sh)
+tools/.build/
+tools/.toolchain/
+# Signing material generated locally by tools/build-apk.sh
+tools/keystore/
+*.idsig
